@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/tailorgunjan93/udf-spec/schema/catalogue.schema.json",
   "title": "UDF catalogue.json",
-  "description": "Section index, embeddings, and document-level intelligence for a UDF archive.",
+  "description": "Section index, optional embeddings, and document-level intelligence for a UDF archive.",
   "type": "object",
   "required": [
     "doc_id",
@@ -56,7 +56,7 @@
     "section_index": {
       "type": "array",
       "minItems": 1,
-      "description": "Ordered list of section descriptors.",
+      "description": "Ordered list of section descriptors. Order MUST match the order of embeddings in embeddings.bin (when present).",
       "items": {
         "type": "object",
         "required": ["id", "title", "level", "parent_id", "children"],
@@ -97,7 +97,7 @@
           },
           "embedding": {
             "type": ["string", "null"],
-            "description": "Base64-encoded quantized float vector, or null."
+            "description": "Base64-encoded quantized float vector, or null. Only used when manifest.embedding_format is \"base64\" (or absent). OMIT this field when embedding_format is \"binary\" — embeddings are stored in embeddings.bin instead."
           },
           "custom": {
             "type": "object"

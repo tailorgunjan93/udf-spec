@@ -1,8 +1,8 @@
 # UDF — Universal Document Format
 
-> **Version 1.0** · [SPEC.md](SPEC.md) · [CHANGELOG.md](CHANGELOG.md) · [License: CC BY 4.0](LICENSE)
+> **Version 1.1** · [SPEC.md](SPEC.md) · [CHANGELOG.md](CHANGELOG.md) · [License: CC BY 4.0](LICENSE)
 
-UDF is an open, ZIP-based portable document format that stores a document's **text**, **vector embeddings**, and **AI-generated intelligence** (summaries, insights, keywords) in a single `.udf` archive.
+UDF is an open, ZIP-based portable document format that stores a document's **text**, **vector embeddings**, and **AI-generated intelligence** (summaries, insights, keywords) in a single `.udf` archive. Designed to be read by both humans and AI systems using the same hierarchical section index.
 
 ---
 
@@ -14,7 +14,9 @@ UDF is an open, ZIP-based portable document format that stores a document's **te
 | Re-embedding costs tokens every query | One-time embed; query is free |
 | Metadata scattered across systems | Single self-contained archive |
 | Vendor lock-in for AI pipelines | Swappable embedding models + LLM providers |
-| Large binary blobs mixed with text | Optional `assets/` folder, lazy-loaded |
+| Large binary blobs slow to load | `embeddings.bin` loaded lazily only when searched |
+| No organisational context on documents | `owner`, `department`, `tags`, `access_roles` fields |
+| Multi-document discovery is slow | Library layer with cross-document keyword index |
 
 ---
 
@@ -22,9 +24,23 @@ UDF is an open, ZIP-based portable document format that stores a document's **te
 
 ```bash
 pip install docnest-ai
-docnest convert report.pdf        # → report.udf
-docnest query   report.udf "What is this document about?"
-docnest inspect report.udf        # prints structure summary
+
+# Convert a document
+docnest convert report.pdf --owner "Alice" --department "Finance" --tags "quarterly,2024"
+
+# Semantic search
+docnest query report.udf "What is this document about?"
+
+# Inspect structure
+docnest inspect report.udf
+
+# View as HTML (opens in browser)
+docnest view report.udf
+
+# Multi-document library
+docnest library init ./docs/
+docnest library add  ./docs/ report.udf
+docnest library search ./docs/ "quarterly revenue"
 ```
 
 ---
@@ -33,12 +49,16 @@ docnest inspect report.udf        # prints structure summary
 
 ```
 report.udf  (ZIP archive)
-├── manifest.json      # format metadata + embedding config
-├── catalogue.json     # section index, summaries, embeddings, insights
-├── content.json       # full section text, tables, images
+├── manifest.json      # format metadata, embedding config, organisational metadata
+├── catalogue.json     # section index, summaries, keywords, insights
+├── content.json       # full section text, tables, image refs
+├── embeddings.bin     # (optional) compact binary embedding blob — loaded lazily
 └── assets/            # (optional) raw images, attachments
     └── img_0001.png
 ```
+
+When `embeddings.bin` is present, embeddings are stored as a flat binary blob in
+`section_index` order — ~87% smaller than base64 strings in `catalogue.json`.
 
 ---
 
@@ -48,16 +68,23 @@ report.udf  (ZIP archive)
 
 ```json
 {
-  "udf_version": "1.0",
-  "doc_id":       "my-report-2024",
-  "title":        "Annual Report 2024",
-  "source_format":"pdf",
-  "created_at":   "2025-01-01T00:00:00+00:00",
-  "embedding_model": "huggingface/all-MiniLM-L6-v2",
-  "embedding_dims":  384,
-  "quantization":    "float16",
-  "section_count":   12,
-  "intelligence":    true
+  "udf_version":      "1.0",
+  "doc_id":           "annual-report-2024",
+  "title":            "Annual Report 2024",
+  "source_format":    "pdf",
+  "created_at":       "2026-01-01T00:00:00+00:00",
+  "embedding_model":  "huggingface/all-MiniLM-L6-v2",
+  "embedding_dims":   384,
+  "quantization":     "float16",
+  "section_count":    12,
+  "intelligence":     true,
+  "embedding_format": "binary",
+  "owner":            "Alice Johnson",
+  "department":       "Finance",
+  "tags":             ["quarterly", "2024", "revenue"],
+  "access_roles":     ["finance", "executives"],
+  "version":          "1.0",
+  "producer":         "docnest-ai 1.0"
 }
 ```
 
@@ -65,9 +92,9 @@ report.udf  (ZIP archive)
 
 ```json
 {
-  "doc_id":  "my-report-2024",
-  "summary": "Annual report summarising financial performance...",
-  "insights": ["Revenue grew 18% YoY", "New markets in APAC"],
+  "doc_id":  "annual-report-2024",
+  "summary": "Annual report summarising financial performance for 2024...",
+  "insights": ["Revenue grew 18% YoY", "New markets opened in APAC"],
   "key_numbers": [
     { "label": "Revenue Growth", "value": "18", "unit": "%", "section": "§3" }
   ],
@@ -76,22 +103,23 @@ report.udf  (ZIP archive)
       "id": "§1", "title": "Executive Summary", "level": 1,
       "parent_id": null, "children": ["§1.1", "§1.2"],
       "summary": "High-level overview of 2024 performance.",
-      "keywords": ["executive", "summary", "performance"],
-      "token_count": 312,
-      "embedding": "<base64-encoded float16 array>"
+      "keywords": ["executive", "summary", "performance", "revenue"],
+      "token_count": 312
     }
   ],
   "embedding_model": "huggingface/all-MiniLM-L6-v2",
-  "embedding_dims": 384,
-  "quantization": "float16"
+  "embedding_dims":  384,
+  "quantization":    "float16"
 }
 ```
+
+> **Note:** When `embedding_format` is `"binary"`, per-section `"embedding"` fields are omitted from `catalogue.json`. All embeddings live in `embeddings.bin` in `section_index` order.
 
 ### `content.json` — Full text
 
 ```json
 {
-  "doc_id": "my-report-2024",
+  "doc_id": "annual-report-2024",
   "sections": {
     "§1": {
       "title": "Executive Summary",
@@ -118,18 +146,32 @@ Sections are identified by a `§` prefix and dot-notation depth:
 §2          second root section
 ```
 
+Both humans and AI navigate the same `§id` index — the catalogue is the shared map.
+
 ---
 
 ## Quantization Modes
 
-| Mode | Bytes / dim | Precision | Use case |
-|---|---|---|---|
-| `float32` | 4 | Full | Research / archival |
-| `float16` | 2 | High | Default |
-| `int8`    | 1 | Good | Storage-constrained |
-| `binary`  | 0.125 | Fast approximate | Mobile / edge |
+| Mode | Bytes/dim | 384-dim stride | Precision | Use case |
+|---|---|---|---|---|
+| `float32` | 4 | 1 536 B | Full | Research / archival |
+| `float16` | 2 | 768 B | High | **Default** |
+| `int8` | 1 | 384 B | Good | Storage-constrained |
+| `binary` | 0.125 | 48 B | Approximate | Mobile / edge |
 
-Embeddings are stored as **base64-encoded raw bytes** in `catalogue.json`.
+Embeddings are stored as a **compact binary blob** (`embeddings.bin`) when `embedding_format = "binary"`, or as **Base64-encoded raw bytes** in `catalogue.json` for backward compatibility.
+
+---
+
+## Embedding Storage: Binary vs Base64
+
+| | Binary (`embeddings.bin`) | Base64 (catalogue) |
+|---|---|---|
+| **catalogue.json size** | ~87% smaller | Baseline |
+| **Load model** | Lazy — only on search | Decoded at open time |
+| **RAM at open** | Near-zero | Full matrix |
+| **numpy read** | `np.frombuffer()` zero-copy | Base64 decode + cast |
+| **Backward compat** | v1.0 readers ignore the file | All versions |
 
 ---
 
@@ -138,9 +180,9 @@ Embeddings are stored as **base64-encoded raw bytes** in `catalogue.json`.
 | Level | Requirement |
 |---|---|
 | L1 | Read manifest + catalogue + content; validate `udf_version` |
-| L2 | L1 + decode embeddings + perform semantic search |
-| L3 | L2 + read/write intelligence fields (summaries, insights) |
-| L4 | L3 + write `.udf` archives + support all quantization modes |
+| L2 | L1 + decode embeddings (both binary and base64) + semantic search |
+| L3 | L2 + read intelligence fields + multi-layer query routing |
+| L4 | L3 + write `.udf` archives + all quantization modes + smart compression |
 
 See [SPEC.md §14](SPEC.md#14-conformance-levels) for full requirements.
 
@@ -148,9 +190,9 @@ See [SPEC.md §14](SPEC.md#14-conformance-levels) for full requirements.
 
 ## Implementations
 
-| Library | Language | UDF version | Status | Link |
-|---|---|---|---|---|
-| **docnest-ai** | Python 3.11+ | 1.0 | ✅ Stable | [github.com/tailorgunjan93/DOCNESTd](https://github.com/tailorgunjan93/DOCNESTd) |
+| Library | Language | UDF version | Conformance | Status | Link |
+|---|---|---|---|---|---|
+| **docnest-ai** | Python 3.11+ | 1.0 | L4 | ✅ Stable | [github.com/tailorgunjan93/DOCNESTd](https://github.com/tailorgunjan93/DOCNESTd) |
 
 See [implementations/README.md](implementations/README.md) for minimal reader/writer examples and how to register your own implementation.
 
@@ -165,13 +207,19 @@ ZIP is universally supported, streamable, and requires zero extra dependencies o
 Those formats require specialised drivers. ZIP + JSON is readable in every language with standard library only.
 
 **Q: Can I store images?**  
-Yes. Place them in `assets/` and reference them by filename in `content.json` section `"images"` arrays.
+Yes. Place them in `assets/` and reference them by filename in `content.json` section `"images"` arrays. PNG/JPEG/WEBP are stored uncompressed inside the ZIP (already compressed formats).
 
 **Q: What if I don't need embeddings?**  
-Set `"embedding_model": null`, `"embedding_dims": 0`, and all `"embedding"` fields to `null`. The file is still valid UDF.
+Set `"embedding_model": null`, `"embedding_dims": 0`, and omit `embeddings.bin`. The file is still valid UDF.
+
+**Q: What is embeddings.bin?**  
+A flat binary blob of all section embeddings concatenated in `section_index` order, each padded to the same stride. Loaded lazily on first search — not at archive-open time.
+
+**Q: What are DocMeta fields?**  
+`owner`, `department`, `tags`, `access_roles`, `version`, and `last_updated` — optional organisational fields in `manifest.json` (added in v1.1). They let enterprises tag, filter, and access-control documents in a library without opening each archive.
 
 **Q: Is UDF stable?**  
-Version 1.0 is stable. See [CHANGELOG.md](CHANGELOG.md) and [SPEC.md §15](SPEC.md#15-versioning-and-forward-compatibility) for the version policy.
+Version 1.0 is stable. Version 1.1 adds only backward-compatible optional fields. See [CHANGELOG.md](CHANGELOG.md) and [SPEC.md §15](SPEC.md#15-versioning-and-forward-compatibility) for the version policy.
 
 ---
 

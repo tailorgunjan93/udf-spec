@@ -1,15 +1,19 @@
 {
   "udf_version": "1.0",
-  "doc_id": "gunjan-tailor-resume",
+  "doc_id": "gunjan-tailor",
   "title": "Gunjan Tailor",
   "source_format": "pdf",
-  "created_at": "2025-06-01T10:30:00+00:00",
+  "created_at": "2026-05-17T10:48:50+00:00",
   "embedding_model": "huggingface/all-MiniLM-L6-v2",
   "embedding_dims": 384,
   "quantization": "float16",
   "section_count": 8,
   "intelligence": true,
-  "language": "en",
-  "source_path": "/downloads/GunjanTailor.pdf",
+  "embedding_format": "binary",
+  "owner": "Gunjan Tailor",
+  "department": "Engineering",
+  "tags": ["resume", "dotnet", "csharp", "azure", "backend", "test-automation"],
+  "access_roles": ["*"],
+  "version": "1.0",
   "producer": "docnest-ai 1.0"
 }

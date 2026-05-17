@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/tailorgunjan93/udf-spec/schema/manifest.schema.json",
   "title": "UDF manifest.json",
-  "description": "Metadata and embedding configuration for a UDF archive.",
+  "description": "Metadata, embedding configuration, and organisational metadata for a UDF archive.",
   "type": "object",
   "required": [
     "udf_version",
@@ -26,7 +26,8 @@
     "doc_id": {
       "type": "string",
       "minLength": 1,
-      "description": "Unique identifier for the document. Must match doc_id in catalogue.json and content.json."
+      "pattern": "^[a-z0-9][a-z0-9\\-_]*$",
+      "description": "Unique URL-safe slug for the document. Derived from filename by splitting CamelCase and replacing spaces with hyphens. Must match doc_id in catalogue.json and content.json."
     },
     "title": {
       "type": "string",
@@ -66,6 +67,12 @@
       "type": "boolean",
       "description": "True if AI-generated intelligence fields (summaries, insights, keywords) are populated."
     },
+    "embedding_format": {
+      "type": "string",
+      "enum": ["base64", "binary"],
+      "default": "base64",
+      "description": "(v1.1) Storage format for embeddings. \"base64\" = per-section base64 strings in catalogue.json (legacy). \"binary\" = flat binary blob in embeddings.bin (preferred)."
+    },
     "language": {
       "type": "string",
       "description": "BCP-47 language tag, e.g. \"en\", \"fr\", \"de\"."
@@ -76,11 +83,37 @@
     },
     "producer": {
       "type": "string",
-      "description": "Name and version of the software that wrote this archive."
+      "description": "Name and version of the software that wrote this archive, e.g. \"docnest-ai 1.0\"."
+    },
+    "owner": {
+      "type": "string",
+      "description": "(v1.1) Person or system that owns this document, e.g. \"Alice Johnson\" or \"finance-team\"."
+    },
+    "department": {
+      "type": "string",
+      "description": "(v1.1) Organisational unit, e.g. \"Engineering\", \"Finance\", \"Legal\"."
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "(v1.1) Free-form lowercase labels for search and filtering."
+    },
+    "access_roles": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "(v1.1) Roles permitted to read this archive. Use [\"*\"] for unrestricted access."
+    },
+    "version": {
+      "type": "string",
+      "description": "(v1.1) Document version string, e.g. \"1.0\", \"2.3\", \"2024-Q3\"."
+    },
+    "last_updated": {
+      "type": "string",
+      "description": "(v1.1) ISO 8601 date or datetime of the last content update."
     },
     "custom": {
       "type": "object",
-      "description": "Arbitrary extension data."
+      "description": "Arbitrary extension data. Use this key for any implementation-specific fields."
     }
   }
 }
