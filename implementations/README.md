@@ -6,9 +6,9 @@ This directory tracks known implementations of the UDF specification.
 
 | Library | Language | UDF version | Conformance | Status | Link |
 |---|---|---|---|---|---|
-| **docnest-ai** | Python 3.11+ | 1.0 | L4 | ✅ Stable | [github.com/tailorgunjan93/DOCNESTd](https://github.com/tailorgunjan93/DOCNESTd) |
+| **docnest-ai** | Python 3.11+ | 1.1 | L4 | ✅ Stable | [github.com/tailorgunjan93/DOCNESTd](https://github.com/tailorgunjan93/DOCNESTd) |
 
-### docnest-ai features (v1.0)
+### docnest-ai features (v1.1)
 
 **Reading & writing**
 - Reads and writes `.udf` v1.0 archives (Level 4 conformant)
