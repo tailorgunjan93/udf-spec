@@ -1,0 +1,109 @@
+{
+  "doc_id": "gunjan-tailor-resume",
+  "title": "Gunjan Tailor",
+  "source": "/downloads/GunjanTailor.pdf",
+  "language": "en",
+  "summary": "Gunjan Tailor is a solution-oriented software professional with 8.5 years of experience in backend development, test automation, and cloud technologies. Skilled in .NET Core, C#, MS SQL, and Azure, with expertise in REST API development and CI/CD pipelines. Currently a Senior Software Engineer at Synechron Technologies.",
+  "insights": [
+    "8.5 years of backend and automation engineering experience",
+    "Expertise in .NET Core C#, MS SQL, Azure, and REST API development",
+    "Led end-to-end test automation frameworks using Selenium and Playwright",
+    "Experience across BFSI domain at Synechron and Capgemini"
+  ],
+  "key_numbers": [
+    { "label": "Years of Experience", "value": "8.5", "unit": "years", "section": "§1" }
+  ],
+  "section_index": [
+    {
+      "id": "§1",
+      "title": "Gunjan Tailor",
+      "level": 1,
+      "parent_id": null,
+      "children": ["§1.1", "§1.2", "§1.3", "§1.4", "§1.5", "§1.6", "§1.7"],
+      "summary": "Gunjan Tailor is a solution-oriented software professional with 8.5 years of experience.",
+      "keywords": ["gunjan", "tailor", "software", "engineer", "professional"],
+      "token_count": 3,
+      "embedding": "AAAAQAAAAP8AAAD/AAAA"
+    },
+    {
+      "id": "§1.1",
+      "title": "Career Objective",
+      "level": 2,
+      "parent_id": "§1",
+      "children": [],
+      "summary": "Seeks a challenging position leveraging backend development and automation skills in a dynamic environment.",
+      "keywords": ["career", "objective", "backend", "automation", "challenging"],
+      "token_count": 63,
+      "embedding": "AAAAQAAAAP8AAAD/AAAB"
+    },
+    {
+      "id": "§1.2",
+      "title": "Skills",
+      "level": 2,
+      "parent_id": "§1",
+      "children": [],
+      "summary": "Backend development with .NET Core C#, test automation with Selenium/Playwright, Azure cloud services, and MS SQL database expertise.",
+      "keywords": ["skills", "dotnet", "csharp", "selenium", "playwright", "azure", "sql", "backend"],
+      "token_count": 83,
+      "embedding": "AAAAQAAAAP8AAAD/AAAC"
+    },
+    {
+      "id": "§1.3",
+      "title": "Experience",
+      "level": 2,
+      "parent_id": "§1",
+      "children": [],
+      "summary": "8.5 years of professional experience as Senior Software Engineer at Synechron Technologies and Test Engineer at Capgemini across BFSI domain.",
+      "keywords": ["experience", "synechron", "capgemini", "senior", "software", "engineer", "bfsi"],
+      "token_count": 185,
+      "embedding": "AAAAQAAAAP8AAAD/AAAD"
+    },
+    {
+      "id": "§1.4",
+      "title": "Strengths",
+      "level": 2,
+      "parent_id": "§1",
+      "children": [],
+      "summary": "Strong analytical thinking, teamwork, adaptability, and problem-solving skills.",
+      "keywords": ["strengths", "analytical", "teamwork", "adaptability", "problem-solving"],
+      "token_count": 53,
+      "embedding": "AAAAQAAAAP8AAAD/AAAE"
+    },
+    {
+      "id": "§1.5",
+      "title": "Achievements / Certifications",
+      "level": 2,
+      "parent_id": "§1",
+      "children": [],
+      "summary": "Holds certifications in Azure and cloud technologies.",
+      "keywords": ["achievements", "certifications", "azure", "cloud"],
+      "token_count": 19,
+      "embedding": "AAAAQAAAAP8AAAD/AAAF"
+    },
+    {
+      "id": "§1.6",
+      "title": "Education",
+      "level": 2,
+      "parent_id": "§1",
+      "children": [],
+      "summary": "Engineering background with computer science specialization.",
+      "keywords": ["education", "engineering", "computer", "science", "degree"],
+      "token_count": 19,
+      "embedding": "AAAAQAAAAP8AAAD/AAAG"
+    },
+    {
+      "id": "§1.7",
+      "title": "Hobbies",
+      "level": 2,
+      "parent_id": "§1",
+      "children": [],
+      "summary": "Personal interests and leisure activities.",
+      "keywords": ["hobbies", "interests", "personal"],
+      "token_count": 9,
+      "embedding": "AAAAQAAAAP8AAAD/AAAH"
+    }
+  ],
+  "embedding_model": "huggingface/all-MiniLM-L6-v2",
+  "embedding_dims": 384,
+  "quantization": "float16"
+}

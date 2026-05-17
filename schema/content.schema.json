@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tailorgunjan93/udf-spec/schema/content.schema.json",
+  "title": "UDF content.json",
+  "description": "Full section text, tables, and image references for a UDF archive.",
+  "type": "object",
+  "required": ["doc_id", "sections"],
+  "additionalProperties": true,
+  "properties": {
+    "doc_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Must match manifest.doc_id and catalogue.doc_id."
+    },
+    "sections": {
+      "type": "object",
+      "description": "Object keyed by §id. Every §id in catalogue.section_index must appear here.",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["title", "level", "text"],
+        "properties": {
+          "title": { "type": "string" },
+          "level": { "type": "integer", "minimum": 1 },
+          "text": {
+            "type": "string",
+            "description": "Full plain text of section body. May be empty string for title-only nodes."
+          },
+          "tables": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["rows"],
+              "properties": {
+                "caption": { "type": "string" },
+                "headers": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "rows": {
+                  "type": "array",
+                  "description": "Array of rows; each row is an array of cell strings.",
+                  "items": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["asset"],
+              "properties": {
+                "asset": {
+                  "type": "string",
+                  "description": "Filename within the assets/ folder."
+                },
+                "caption": { "type": "string" },
+                "alt": {
+                  "type": "string",
+                  "description": "Alt text or OCR output."
+                }
+              }
+            }
+          },
+          "custom": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}

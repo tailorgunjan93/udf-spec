@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tailorgunjan93/udf-spec/schema/catalogue.schema.json",
+  "title": "UDF catalogue.json",
+  "description": "Section index, embeddings, and document-level intelligence for a UDF archive.",
+  "type": "object",
+  "required": [
+    "doc_id",
+    "title",
+    "section_index",
+    "embedding_model",
+    "embedding_dims",
+    "quantization"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "doc_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Must match manifest.doc_id and content.doc_id."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "string",
+      "description": "Original file path or URL."
+    },
+    "language": {
+      "type": "string",
+      "description": "BCP-47 language tag."
+    },
+    "summary": {
+      "type": "string",
+      "description": "Document-level abstractive summary (AI-generated or manual)."
+    },
+    "insights": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Key bullet-point findings from the document."
+    },
+    "key_numbers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "value"],
+        "properties": {
+          "label":   { "type": "string" },
+          "value":   { "type": "string", "description": "Stored as string to preserve precision." },
+          "unit":    { "type": "string" },
+          "section": { "type": "string", "description": "§id of the source section." }
+        }
+      }
+    },
+    "section_index": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Ordered list of section descriptors.",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "level", "parent_id", "children"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^§[1-9][0-9]*(\\.[1-9][0-9]*)*$",
+            "description": "Section identifier, e.g. \"§1.2\"."
+          },
+          "title": { "type": "string" },
+          "level": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Nesting depth. 1 = top-level section."
+          },
+          "parent_id": {
+            "type": ["string", "null"],
+            "description": "§id of parent section, or null for root sections."
+          },
+          "children": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "§ids of direct child sections."
+          },
+          "summary": {
+            "type": "string",
+            "description": "Section-level abstractive summary."
+          },
+          "keywords": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Lower-cased topical keywords."
+          },
+          "token_count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Approximate token count of section body text."
+          },
+          "embedding": {
+            "type": ["string", "null"],
+            "description": "Base64-encoded quantized float vector, or null."
+          },
+          "custom": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "embedding_model": {
+      "type": ["string", "null"],
+      "description": "Must match manifest.embedding_model."
+    },
+    "embedding_dims": {
+      "type": ["integer", "null"],
+      "minimum": 1,
+      "description": "Must match manifest.embedding_dims."
+    },
+    "quantization": {
+      "type": ["string", "null"],
+      "enum": ["float32", "float16", "int8", "binary", null],
+      "description": "Must match manifest.quantization."
+    },
+    "custom": {
+      "type": "object"
+    }
+  }
+}

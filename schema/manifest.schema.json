@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tailorgunjan93/udf-spec/schema/manifest.schema.json",
+  "title": "UDF manifest.json",
+  "description": "Metadata and embedding configuration for a UDF archive.",
+  "type": "object",
+  "required": [
+    "udf_version",
+    "doc_id",
+    "title",
+    "source_format",
+    "created_at",
+    "embedding_model",
+    "embedding_dims",
+    "quantization",
+    "section_count",
+    "intelligence"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "udf_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$",
+      "description": "UDF specification version, e.g. \"1.0\"."
+    },
+    "doc_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for the document. Must match doc_id in catalogue.json and content.json."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable document title."
+    },
+    "source_format": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Original file format: \"pdf\", \"docx\", \"txt\", \"html\", \"md\", etc."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp of archive creation."
+    },
+    "embedding_model": {
+      "type": ["string", "null"],
+      "description": "Embedding model identifier, e.g. \"huggingface/all-MiniLM-L6-v2\". Null if no embeddings."
+    },
+    "embedding_dims": {
+      "type": ["integer", "null"],
+      "minimum": 1,
+      "description": "Number of embedding dimensions. Null if no embeddings."
+    },
+    "quantization": {
+      "type": ["string", "null"],
+      "enum": ["float32", "float16", "int8", "binary", null],
+      "description": "Quantization mode used for stored embeddings."
+    },
+    "section_count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Total number of sections. Must equal length of catalogue.json section_index."
+    },
+    "intelligence": {
+      "type": "boolean",
+      "description": "True if AI-generated intelligence fields (summaries, insights, keywords) are populated."
+    },
+    "language": {
+      "type": "string",
+      "description": "BCP-47 language tag, e.g. \"en\", \"fr\", \"de\"."
+    },
+    "source_path": {
+      "type": "string",
+      "description": "Original file path at conversion time."
+    },
+    "producer": {
+      "type": "string",
+      "description": "Name and version of the software that wrote this archive."
+    },
+    "custom": {
+      "type": "object",
+      "description": "Arbitrary extension data."
+    }
+  }
+}
