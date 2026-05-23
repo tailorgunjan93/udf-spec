@@ -2,7 +2,11 @@
 
 > **Version 1.1** · [SPEC.md](SPEC.md) · [CHANGELOG.md](CHANGELOG.md) · [License: CC BY 4.0](LICENSE)
 
-UDF is an open, ZIP-based portable document format that stores a document's **text**, **vector embeddings**, and **AI-generated intelligence** (summaries, insights, keywords) in a single `.udf` archive. Designed to be read by both humans and AI systems using the same hierarchical section index.
+UDF is an open, ZIP-based portable document format that stores a document's **text**, **vector embeddings**, and **AI-generated intelligence** (summaries, insights, keywords) in a single `.udf` archive. Built for AI pipelines and RAG systems — not for end-user document management.
+
+> **Who is UDF for?**  
+> UDF is an **AI-first, developer-first format.** It is designed for ML engineers, RAG pipeline builders, and researchers who need a portable, queryable knowledge base — not for business users who open documents directly. Human-readable output is produced via `docnest view` (HTML) or the application layer built on top.  
+> See [§ Intended Audience](#intended-audience) for the full breakdown.
 
 ---
 
@@ -188,11 +192,50 @@ See [SPEC.md §14](SPEC.md#14-conformance-levels) for full requirements.
 
 ---
 
+## Intended Audience
+
+UDF is an **AI-first, developer-first format.** It is not a consumer document format like PDF or DOCX.
+
+| User | Fits UDF? | Why |
+|---|---|---|
+| ML / RAG engineer | ✅ Primary | Builds pipelines on top of `.udf` — this is the core use case |
+| Researcher | ✅ Yes | Converts paper collections to queryable, portable knowledge bases |
+| Backend developer | ✅ Yes | UDF as the storage layer behind a chatbot or search product |
+| Data scientist | ✅ Yes | Extracts structured tables, summaries, key numbers via Python API |
+| Business analyst | ⚠️ Via app | Should interact with a product UI or `docnest view` HTML output — not `.udf` directly |
+| Document manager | ⚠️ Via app | Same — UDF is the engine, not the interface |
+| End consumer | ❌ Not directly | Not designed for this; the application layer bridges the gap |
+
+**Bridges for non-developer users:**
+- `docnest view report.udf` — generates a fully human-readable, self-contained HTML page (opens in browser)
+- `docnest inspect report.udf` — prints section tree, metadata, key numbers in plain text
+- Application UIs built on top of DOCNEST (chatbots, search portals, dashboards)
+- VS Code extension: [udf-reader-vscode](https://github.com/tailorgunjan93/udf-reader-vscode) — browse `.udf` files directly in the editor
+
+The `.udf` format is intentionally optimised for AI query performance, not human direct-opening. Changing this would compromise the embedding storage model and section index structure that make DocNest fast and accurate.
+
+---
+
+## Accuracy (v7 eval — May 2026)
+
+The reference implementation `docnest-ai` achieves **9.55 / 10** honest accuracy across **88 questions, 10 documents, 5 formats**:
+
+| Format | Score | Pass Rate |
+|---|---|---|
+| DOCX · HTML · MD | 9.9–10.0 / 10 | 100% |
+| XLSX | 8.8 / 10 | 87% |
+| PDF (scientific papers) | 7.8–10.0 / 10 | 60–100% |
+| **Overall** | **9.55 / 10** | **95.5%** |
+
+4 real retrieval errors in 88 questions. Zero LLM hallucinations. Evaluator: Cerebras `qwen-3-235b-a22b-instruct-2507`.
+
+---
+
 ## Implementations
 
 | Library | Language | UDF version | Conformance | Status | Link |
 |---|---|---|---|---|---|
-| **docnest-ai** | Python 3.11+ | 1.0 | L4 | ✅ Stable | [github.com/tailorgunjan93/DOCNESTd](https://github.com/tailorgunjan93/DOCNESTd) |
+| **docnest-ai** | Python 3.11+ | 1.1 | L4 | ✅ Stable | [github.com/tailorgunjan93/docnest](https://github.com/tailorgunjan93/docnest) |
 
 See [implementations/README.md](implementations/README.md) for minimal reader/writer examples and how to register your own implementation.
 

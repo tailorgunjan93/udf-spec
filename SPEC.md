@@ -2,7 +2,7 @@
 
 **Status:** Stable  
 **Published:** 2026-05-17  
-**Updated:** 2026-05-17 (v1.1)  
+**Updated:** 2026-05-23 (v1.1)  
 **Author:** Gunjan Tailor  
 **License:** [CC BY 4.0](LICENSE)
 
@@ -51,13 +51,25 @@ The key words MUST, MUST NOT, REQUIRED, SHOULD, SHOULD NOT, MAY, and OPTIONAL in
 
 ## 2. Design Goals
 
+### Primary goals (AI pipeline)
 1. **Zero-dependency readability** — The three core JSON files MUST be parseable with standard library only (Python `json`, Node.js `JSON.parse`, etc.).
 2. **Single-file portability** — One `.udf` file contains everything needed to query a document offline.
 3. **Swappable AI** — The format records which model produced the embeddings but does not mandate a specific provider.
 4. **Forward-compatible** — New fields MUST be ignored by readers that do not recognise them.
-5. **Human-inspectable** — A developer can `unzip -p report.udf manifest.json | python -m json.tool` and read the output.
-6. **Memory-efficient** — Embeddings SHOULD be stored as a compact binary blob (`embeddings.bin`) loaded lazily on demand, not decoded at archive-open time.
-7. **Organisational** — Documents SHOULD carry ownership, department, and access-control metadata so they can be managed at enterprise scale.
+5. **Memory-efficient** — Embeddings SHOULD be stored as a compact binary blob (`embeddings.bin`) loaded lazily on demand, not decoded at archive-open time.
+6. **Organisational** — Documents SHOULD carry ownership, department, and access-control metadata so they can be managed at enterprise scale.
+7. **Query performance** — Structure and pre-computed intelligence MUST be optimised for AI retrieval accuracy, not for human direct-reading.
+
+### Secondary goal (developer inspection)
+8. **Developer-inspectable** — A developer SHOULD be able to `unzip -p report.udf manifest.json | python -m json.tool` and read the output. This is a debugging and auditing aid, not the primary consumption path.
+
+### Non-goal: direct human consumption
+UDF is **not** designed to be opened directly by end users (business analysts, document managers, or consumers). Human-readable output is delegated to the **application layer**:
+- `docnest view report.udf` → self-contained HTML (opens in browser)
+- `docnest inspect report.udf` → plain-text section tree
+- VS Code extension, desktop apps, or product UIs built on top of a UDF reader
+
+Attempting to make `.udf` a direct end-user format would require compromising the embedding storage model (flat binary blob) and section index structure that make retrieval fast and accurate. This trade-off is intentional.
 
 ---
 

@@ -6,6 +6,35 @@ This project adheres to [Semantic Versioning](https://semver.org/) (MAJOR.MINOR)
 
 ---
 
+## [1.2] — 2026-05-23
+
+### Clarified — Intended Audience and Design Philosophy
+
+- **Non-goal explicitly documented**: UDF is an AI-first, developer-first format. Direct end-user consumption is a non-goal. Added to SPEC.md §2 Design Goals.
+- Human-readable output paths documented: `docnest view` (HTML), `docnest inspect` (text), VS Code extension, application UIs.
+- SPEC.md §2 restructured into "Primary goals", "Secondary goal (developer inspection)", and "Non-goal: direct human consumption".
+- README.md updated with "Intended Audience" table and accuracy results from v7 evaluation.
+
+### Updated — Accuracy Benchmark
+
+Reference implementation `docnest-ai` v0.5+:
+- **9.55 / 10** honest accuracy (88 questions, 10 documents, 5 formats)
+- 95.5% pass rate (84/88 questions)
+- 4 real retrieval errors, zero LLM hallucinations
+- DOCX, HTML, MD: 10.0/10 with 100% pass rate
+- Evaluator: Cerebras `qwen-3-235b-a22b-instruct-2507`
+
+### Updated — Reference Implementation
+
+- `docnest-ai` now at v0.5+, conformance L4
+- Added Cerebras API support to eval tooling
+- Added cross-encoder reranker with eager startup load
+- Added `--no-reranker` flag for speed-critical pipelines
+- Added CSVParser (`.csv` / `.tsv`) to supported formats
+- Repo link updated: [github.com/tailorgunjan93/docnest](https://github.com/tailorgunjan93/docnest)
+
+---
+
 ## [1.1] — 2026-05-17
 
 ### Added — Embedding Storage
